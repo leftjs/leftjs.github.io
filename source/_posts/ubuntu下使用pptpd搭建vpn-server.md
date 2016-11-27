@@ -93,7 +93,7 @@ SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="44:33:4c:07:ad:48", NAME="eno1"
 2. 添加内外网路由，默认情况下重启后路由表会丢失
 3. 持续ping对方网关，保证服务器的稳定
 
-代码地址:[leftjs/vpn_launch][9155e1a0]leftjs/vpn_launch
+代码地址:[leftjs/vpn_launch][911b7533]
 
 launch.js:
 ```python
@@ -174,9 +174,6 @@ if __name__ == '__main__':
         time.sleep(2)
 
 ```
-
-  [9155e1a0]: https://github.com/leftjs/vpn_launch "leftjs/vpn_launch"
-
-
+  [911b7533]: https://github.com/leftjs/vpn_launch "leftjs/vpn_launch"
   [890a6ed5]: https://github.com/xuzhipengnt/ipclient_gxnu "ipclient_gxnu"
   [72f609bc]: http://sec.guet.edu.cn/open/ "http://sec.guet.edu.cn/open/"
