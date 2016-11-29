@@ -61,3 +61,64 @@ data: {
 - `v-else`紧跟在 `v-if`或者 `v-show`后面才用意义
 
 ## 列表渲染
+1. 基本用法
+```JavaScript
+<ul id="example-1">
+  <li v-for="item in items">
+    {{ item.message }}
+  </li>
+</ul>
+var example1 = new Vue({
+  el: '#example-1',
+  data: {
+    items: [
+      {message: 'foo' },
+      {message: 'Bar' }
+    ]
+  }
+})
+```
+2. of 替代 in 作为分隔符，因为它是最接近 JavaScript 迭代器的语法
+```JavaScript
+<div v-for="item of items"></div>
+```
+3. 如同 `v-if` 模板，你也可以用带有 v-for 的 <template> 标签来渲染多个元素块
+```JavaScript
+<ul>
+  <template v-for="item in items">
+    <li>{{ item.msg }}</li>
+    <li class="divider"></li>
+  </template>
+</ul>
+```
+4. `v-for` 可以通过一个独享的属性来迭代
+```JavaScript
+<ul id="repeat-object" class="demo">
+  <li v-for="value in object">
+    {{ value }}
+  </li>
+</ul>
+new Vue({
+  el: '#repeat-object',
+  data: {
+    object: {
+      FirstName: 'John',
+      LastName: 'Doe',
+      Age: 30
+    }
+  }
+})
+```
+可以提供第二个的参数为键名：
+```JavaScript
+<div v-for="(value, key) in object">
+  {{ key }} : {{ value }}
+</div>
+```
+第三个参数为索引：
+```JavaScript
+<div v-for="(value, key, index) in object">
+  {{ index }}. {{ key }} : {{ value }}
+</div>
+```
+5. `// todo`
