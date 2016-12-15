@@ -175,6 +175,49 @@ if __name__ == '__main__':
         time.sleep(2)
 
 ```
+
+## 寝室ip扫描代码
+在实验室连入校内网批量ping宿舍ip，找出自己的主机。
+
+ping_test.py:
+```python
+from threading import Thread
+import subprocess
+from Queue import Queue
+
+num_threads = 100
+queue = Queue()
+ips = ['10.20.38.' + str(a) for a in range(1, 255)] + ['10.20.39.' + str(a) for a in range(1, 255)]
+
+#wraps system ping command
+def pinger(i, q):
+    """Pings subnet"""
+    while True:
+        ip = q.get()
+        print "Thread %s: Pinging %s" % (i, ip)
+        ret = subprocess.call("ping -c 1 %s" % ip,
+            shell=True,
+            stdout=open('/dev/null', 'w'),
+            stderr=subprocess.STDOUT)
+        if ret == 0:
+            print "%s: is alive" % ip
+            with open('./result.txt', 'a') as f:
+                f.write("%s: is alive\n" % ip)
+        else:
+            print "%s: did not respond" % ip
+        q.task_done()
+#Spawn thread pool
+for i in range(num_threads):
+    worker = Thread(target=pinger, args=(i, queue))
+    worker.setDaemon(True)
+    worker.start()
+#Place work in queue
+for ip in ips:
+    queue.put(ip)
+#Wait until worker threads are done to exit
+queue.join()
+```
+
   [911b7533]: https://github.com/leftjs/vpn_launch "leftjs/vpn_launch"
   [890a6ed5]: https://github.com/xuzhipengnt/ipclient_gxnu "ipclient_gxnu"
   [72f609bc]: http://sec.guet.edu.cn/open/ "http://sec.guet.edu.cn/open/"
