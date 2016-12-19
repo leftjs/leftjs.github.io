@@ -7,7 +7,8 @@
   },
   "scripts": {
     "backup": "cp themes/next/_config.yml ./_next_config_backup.yml",
-    "deploy": "npm run backup && git add . && git commit -m \"deploy\" && git push origin backup && hexo d --g"
+    "push": "git add . && git commit -m \"deploy\" && git push origin backup",
+    "deploy": "npm run backup && npm run push && hexo d --g"
   },
   "dependencies": {
     "hexo": "^3.2.0",
