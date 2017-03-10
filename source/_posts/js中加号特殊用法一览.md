@@ -2,7 +2,8 @@
 title: js中加号特殊用法一览
 date: 2017-03-10 10:21:22
 tags:
-categories:
+  - javascript
+categories: 学习笔记
 ---
 > js中的 `+` 有多种用途，总结如下
 
