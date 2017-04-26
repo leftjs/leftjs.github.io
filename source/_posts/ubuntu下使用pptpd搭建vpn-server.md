@@ -18,18 +18,18 @@ tags:
 桂电宿舍的网线都是单网线三网通用的，其实原理很简单，就是在上层做了一下网关开放的工作，通过一个叫做出校器的工具，选择一个运营商，将拨号所用的mac地址和相关的运营商进行绑定，此后的所有的数据包都发往指定运营商的网关，基于这个原理，可以在实验室等能够连通内网的设备上定期进行相关端口开放的工作(前提是将该设备的mac修改为路由器的mac地址)，另外，这里推荐一个师大师兄编写的mac、linux、windows下的第三方出校器和端口开放工具[ipclient_gxnu][890a6ed5],项目中的有详细的介绍和文档，推荐学习。此外，如果仅仅是需要进行运营商和mac地址的绑定的话，推荐使用桂电某学生编写的在线端口绑定网站:[http://sec.guet.edu.cn/open/][72f609bc]将路由mac地址和某运营商端口进行绑定
 
 ## ubuntu发行版本选择
-由于之前我用的是ubuntu的最新的发行版本，在dhcp的时候经常会出现三个默认路由的情况，我也没有深入研究原因，后来换到16.02LTS上后，同样的配置，dhcp后默认只有一个默认路由，所以推荐16.02LTS
+由于之前我用的是ubuntu的最新的发行版本，在dhcp的时候经常会出现三个默认路由的情况，我也没有深入研究原因，后来换到16.04LTS上后，同样的配置，dhcp后默认只有一个默认路由，所以推荐16.04LTS
 
 ## 配置
 安装pptpd
 ```bash
 sudo apt-get install pptpd
 ```
-配置虚拟ip，编辑/etc/pptpd.conf:
-```
+~~配置虚拟ip，编辑/etc/pptpd.conf~~ ( _这一步可以不用做，因为python脚本中会覆盖_ ):
+~~```
 localip 10.20.39.111 # 本机ip
 remoteip 10.100.123.2-100 # 分配的ip段
-```
+```~~
 在/etc/ppp/pptpd-options下中设置dns:
 ```
 #根据实际情况设置dns
@@ -61,9 +61,13 @@ sudo sysctl -p
 ```
 sudo apt-get install iptables
 ```
-建立一个NAT:
+建立一个外网NAT（外网走无线）:
 ```
 sudo iptables -t nat -A POSTROUTING -s 10.100.123.0/24 -o wlo1 -j MASQUERADE
+```
+建立一个内网NAT（内网走有线）:
+```
+sudo iptables -t nat -A POSTROUTING -s 10.100.123.0/24 -d 172.16.0.0/16 -o eno1 -j MASQUERADE
 ```
 其中-o参数配置的是流量的出口,也就是我这的外网出口
 设置MTU,防止包过大而丢包:
@@ -90,23 +94,77 @@ SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="44:33:4c:07:ad:48", NAME="eno1"
 ```
 
 ## 服务器启动代码
-主要用于
+### 目的
 1. 修改dhcp后的ip为静态ip
 2. 添加内外网路由，默认情况下重启后路由表会丢失
 3. 持续ping对方网关，保证服务器的稳定，推荐使用tmux来维持会话状态，保证程序存活
+### 启动方式
+安装 `nodejs` 和 `npm` :
+```
+sudo apt install nodejs npm
+```
+切换到 `/usr/bin` 目录下，建立一个 `node` 到 `nodejs` 的软连接，因为 `pm2` 启动时需要执行 `node` 命令:
+```
+cd /usr/bin
+sudo ln -s ./node.js node
+```
+使用 `npm` 安装 `pm2` :
+```
+sudo npm install -g pm2
+```
+使用 `pm2` 启动项目，并将其加入开启自启中:
+```
+cd vpn_launch
+pm2 start ./launch.py --name="vpn"
+pm2 save
+pm2 startup
+```
+至此，您的pc、树莓派已经具有了开机自启、daemon、线路自检等功能，理论上已经不会掉线
 代码地址:[leftjs/vpn_launch][911b7533]
 
 launch.py:
 ```python
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import socket, fcntl, struct
 import commands
 import time
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 
+# 第三方 SMTP 服务
+mail_host="smtp.qq.com"  #设置服务器
+mail_user="leftjs@foxmail.com"    #用户名
+mail_pass="xxxx"   #授权口令
+sender = 'leftjs@foxmail.com'
+receivers = ['lefttjs@gmail.com']  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+
+
+
+def send_email(text):
+    message = MIMEText('%s' % text, 'plain', 'utf-8')
+    message['From'] = Header("leftjs", 'utf-8')
+    message['To'] =  Header("jason zhang", 'utf-8')
+    subject = 'vpn 报告'
+    message['Subject'] = Header(subject, 'utf-8')
+    try:
+        smtpObj = smtplib.SMTP_SSL()
+        smtpObj.connect(mail_host, 465)    # 25 为 SMTP 端口号
+        smtpObj.login(mail_user,mail_pass)
+        smtpObj.sendmail(sender, receivers, message.as_string())
+        print "邮件发送成功"
+    except smtplib.SMTPException:
+        print "Error: 无法发送邮件"
 
 def get_local_ip(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))
-    return socket.inet_ntoa(inet[20:24])
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))
+        return socket.inet_ntoa(inet[20:24])
+    except Exception, e:
+        send_email(str(e))
+        return
 
 def check_ping():
     (ping_state, res) = commands.getstatusoutput('ping 202.193.75.254 -c 2')
@@ -143,9 +201,10 @@ def restart_dnsmasq(intranet_ip):
     commands.getstatusoutput('service dnsmasq restart')
 
 def add_route_item():
-    commands.getstatusoutput('ip route add 202.193.0.0/16 via 10.20.39.254 dev eno1')
-    commands.getstatusoutput('ip route add 10.100.123.0/24 via 10.20.39.254 dev eno1')
-    commands.getstatusoutput('ip route add 10.20.0.0/16 via 10.20.39.254 dev eno1')
+    commands.getstatusoutput('ip route add 202.193.0.0/16 via 10.20.40.254 dev eno1')
+    commands.getstatusoutput('ip route add 10.100.123.0/24 via 10.20.40.254 dev eno1')
+    commands.getstatusoutput('ip route add 10.20.0.0/16 via 10.20.40.254 dev eno1')
+    commands.getstatusoutput('ip route add 172.16.0.0/16 via 10.20.40.254 dev eno1')
 
 
 if __name__ == '__main__':
@@ -158,8 +217,11 @@ if __name__ == '__main__':
             commands.getstatusoutput('dhclient eno1')
             # get new intranet ip
             intranet_ip = get_local_ip("eno1")
+            if intranet_ip is None:
+                continue
             if old_ip == None or old_ip != intranet_ip:
                 print 'new ip: ',intranet_ip
+                send_email('新的ip为: %s' % intranet_ip)
                 create_interfaces_static_file(intranet_ip)
                 restart_pptpd(intranet_ip)
                 # restart_dnsmasq(intranet_ip)
@@ -173,6 +235,7 @@ if __name__ == '__main__':
             print 'config complete.'
             continue
         time.sleep(2)
+
 
 ```
 
