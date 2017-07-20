@@ -69,8 +69,6 @@ babel首先查找被编译文件所在目录的 `.babelrc`如果不存在则上�
 
 通过在 `options`中使用 `"babelrc": false` 来终止搜索行为，或者通过提供 `--no-babelrc`的cli flag
 
-
-
   [760ee0e9]: https://babeljs.io/docs/usage/cli/ "babel-cli"
 
   [56a5bd12]: https://babeljs.io/docs/usage/babelrc/ ".babelrc"
