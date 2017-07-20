@@ -1,12 +1,12 @@
 ---
-title: babel核心部分笔记
+title: babel笔记
 date: 2017-07-20 10:56:13
 tags:
   - babel
 categories: 学习笔记
 ---
 
-# babel核心部分笔记
+# babel笔记
 
 ## 安装方式
 > 详情可以参考 [babel-cli][760ee0e9]
