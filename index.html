@@ -293,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/19/TSM 存储方案/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/19/InfluxDB 存储/InfluxDB存储/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jason Zhang">
@@ -312,8 +312,8 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/09/19/TSM 存储方案/" itemprop="url">
-                  TSM 存储方案
+                <a class="post-title-link" href="/2018/09/19/InfluxDB 存储/InfluxDB存储/" itemprop="url">
+                  Influx 存储
                 </a>
               
             
@@ -339,7 +339,7 @@
                 
               
 
-              <time title="Created: 2018-09-19 16:18:43 / Modified: 20:42:59" itemprop="dateCreated datePublished" datetime="2018-09-19T16:18:43+08:00">2018-09-19</time>
+              <time title="Created: 2018-09-19 16:18:43 / Modified: 21:03:20" itemprop="dateCreated datePublished" datetime="2018-09-19T16:18:43+08:00">2018-09-19</time>
             
 
             
@@ -433,6 +433,33 @@
 </ul>
 </li>
 </ol>
+<h1 id="TimeSeries-Index"><a href="#TimeSeries-Index" class="headerlink" title="TimeSeries Index"></a>TimeSeries Index</h1><p>时序数据库除了支撑时序数据的存储和计算外，还需要能够提供多维度查询。InfluxDB 为了提供更快速的多维查询，对 TimeSeries 进行了索引。关于数据和索引，InfluxDB 是这么描述自己的：</p>
+<blockquote>
+<p>InfluxDB actually looks like two databases in one: a time series data store and an inverted index for the measurement, tag, and field metadata.</p>
+</blockquote>
+<p>在 InfluxDB 1.3 之前，TimeSeries Index(下面简称为 TSI)只支持 Memory-based 的方式，即所有的 TimeSeries 的索引都是放在内存内，这种方式有好处但是也会带来很多的问题。而在最新发布的 InfluxDB 1.3 版本上，提供了另外一种方式的索引可供选择，新的索引方式会把索引存储在磁盘上，效率上相比内存索引差一点，但是解决了内存索引存在的不少问题。</p>
+<h2 id="Memory-based-Index"><a href="#Memory-based-Index" class="headerlink" title="Memory-based Index"></a>Memory-based Index</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Measurement represents a collection of time series in a database. It also</span></span><br><span class="line">    <span class="comment">// contains in memory structures for indexing tags. Exported functions are</span></span><br><span class="line">    <span class="comment">// goroutine safe while un-exported functions assume the caller will use the</span></span><br><span class="line">    <span class="comment">// appropriate locks.</span></span><br><span class="line">    <span class="keyword">type</span> Measurement <span class="keyword">struct</span> &#123;</span><br><span class="line">     database <span class="keyword">string</span></span><br><span class="line">     Name     <span class="keyword">string</span> <span class="string">`json:"name,omitempty"`</span></span><br><span class="line">     name     []<span class="keyword">byte</span> <span class="comment">// cached version as []byte</span></span><br><span class="line"></span><br><span class="line">     mu         sync.RWMutex</span><br><span class="line">     fieldNames <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// in-memory index fields</span></span><br><span class="line">     seriesByID          <span class="keyword">map</span>[<span class="keyword">uint64</span>]*Series              <span class="comment">// lookup table for series by their id</span></span><br><span class="line">     seriesByTagKeyValue <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">map</span>[<span class="keyword">string</span>]SeriesIDs <span class="comment">// map from tag key to value to sorted set of series ids</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">// lazyily created sorted series IDs</span></span><br><span class="line">     sortedSeriesIDs SeriesIDs <span class="comment">// sorted list of series IDs in this measurement</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Series belong to a Measurement and represent unique time series in a database.</span></span><br><span class="line">    <span class="keyword">type</span> Series <span class="keyword">struct</span> &#123;</span><br><span class="line">     mu          sync.RWMutex</span><br><span class="line">     Key         <span class="keyword">string</span></span><br><span class="line">     tags        models.Tags</span><br><span class="line">     ID          <span class="keyword">uint64</span></span><br><span class="line">     measurement *Measurement</span><br><span class="line">     shardIDs    <span class="keyword">map</span>[<span class="keyword">uint64</span>]<span class="keyword">struct</span>&#123;&#125; <span class="comment">// shards that have this series defined</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>如上是 InfluxDB 1.3 的源码中对内存索引数据结构的定义，主要有两个重要的数据结构体：</p>
+<p><strong>Series</strong>: 对应某个 TimeSeries，其内存储 TimeSeries 相关的一些基本属性以及它所属的 Shard</p>
+<ul>
+<li>Key：对应 measurement + tags 序列化后的字符串。</li>
+<li>tags: 该 TimeSeries 下所有的 TagKey 和 TagValue</li>
+<li>ID: 用于唯一区分的整数 ID。</li>
+<li>measurement: 所属的 measurement。</li>
+<li>shardIDs: 所有包含该 Series 的 ShardID 列表。</li>
+</ul>
+<p><strong>Measurement</strong>: 每个 measurement 在内存中都会对应一个 Measurement 结构，其内部主要是一些索引来加速查询。</p>
+<ul>
+<li>seriesByID：通过 SeriesID 查询 Series 的一个 Map。</li>
+<li>seriesByTagKeyValue：双层 Map，第一层是 TagKey 对应其所有的 TagValue，第二层是 TagValue 对应的所有 Series 的 ID。可以看到，当 TimeSeries 的基数变得很大，这个 map 所占的内存会相当多。</li>
+<li>sortedSeriesIDs：一个排序的 SeriesID 列表。</li>
+</ul>
+<p>全内存索引结构带来的好处是能够提供非常高效的多维查询，但是相应的也会存在一些问题：</p>
+<ul>
+<li>能够支持的 TimeSeries 基数有限，主要受限于内存的大小。若 TimeSeries 个数超过上限，则整个数据库会处于不可服务的状态。这类问题一般由用户错误的设计 TagKey 引发，例如某个 TagKey 是一个随机的 ID。一旦遇到这个问题的话，也很难恢复，往往只能通过手动删数据。</li>
+<li>若进程重启，恢复数据的时间会比较长，因为需要从所有的 TSM 文件中加载全量的 TimeSeries 信息来在内存中构建索引。</li>
+</ul>
+<h2 id="Disk-based-Index"><a href="#Disk-based-Index" class="headerlink" title="Disk-based Index"></a>Disk-based Index</h2><p>针对全内存索引存在的这些问题，InfluxDB 在最新的 1.3 版本中提供了另外一种索引的实现。得益于代码设计上良好的扩展性，索引模块和存储引擎模块都是插件化的，用户可以在配置中自由选择使用哪种索引。</p>
 
           
         
