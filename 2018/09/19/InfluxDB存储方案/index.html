@@ -111,15 +111,15 @@
   <meta name="description" content="InfluxDBInfluxDB 在 DB-Engines 的时序数据库类别里排名第一，实至名归，从它的功能丰富性、易用性以及底层实现来看，都有很多的亮点，值得大篇幅来分析。 首先简单归纳下它的几个比较重要的特性：  极简架构：单机版的 InfluxDB 只需要安装一个 binary，即可运行使用，完全没有任何的外部依赖。相比来看几个反面例子，OpenTSDB 底层是 HBase，拖家带口就得带上">
 <meta name="keywords" content="分布式系统,存储引擎,数据库,InfluxDB">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Influx 存储方案">
+<meta property="og:title" content="InfluxDB 存储方案">
 <meta property="og:url" content="http://yoursite.com/2018/09/19/InfluxDB存储方案/index.html">
 <meta property="og:site_name" content="leftjs&#39;s Blog">
 <meta property="og:description" content="InfluxDBInfluxDB 在 DB-Engines 的时序数据库类别里排名第一，实至名归，从它的功能丰富性、易用性以及底层实现来看，都有很多的亮点，值得大篇幅来分析。 首先简单归纳下它的几个比较重要的特性：  极简架构：单机版的 InfluxDB 只需要安装一个 binary，即可运行使用，完全没有任何的外部依赖。相比来看几个反面例子，OpenTSDB 底层是 HBase，拖家带口就得带上">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/2018/09/disk-based-index-structure.png">
-<meta property="og:updated_time" content="2018-09-19T15:00:10.368Z">
+<meta property="og:updated_time" content="2018-09-19T15:03:22.101Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Influx 存储方案">
+<meta name="twitter:title" content="InfluxDB 存储方案">
 <meta name="twitter:description" content="InfluxDBInfluxDB 在 DB-Engines 的时序数据库类别里排名第一，实至名归，从它的功能丰富性、易用性以及底层实现来看，都有很多的亮点，值得大篇幅来分析。 首先简单归纳下它的几个比较重要的特性：  极简架构：单机版的 InfluxDB 只需要安装一个 binary，即可运行使用，完全没有任何的外部依赖。相比来看几个反面例子，OpenTSDB 底层是 HBase，拖家带口就得带上">
 <meta name="twitter:image" content="http://yoursite.com/images/2018/09/disk-based-index-structure.png">
 
@@ -138,7 +138,7 @@
   };
 </script>
 
-  <title>Influx 存储方案 | leftjs's Blog</title>
+  <title>InfluxDB 存储方案 | leftjs's Blog</title>
   
 
 
@@ -316,7 +316,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Influx 存储方案
+          <h1 class="post-title" itemprop="name headline">InfluxDB 存储方案
               
             
           </h1>
@@ -341,7 +341,7 @@
                 
               
 
-              <time title="Created: 2018-09-19 16:18:43 / Modified: 23:00:10" itemprop="dateCreated datePublished" datetime="2018-09-19T16:18:43+08:00">2018-09-19</time>
+              <time title="Created: 2018-09-19 16:18:43 / Modified: 23:03:22" itemprop="dateCreated datePublished" datetime="2018-09-19T16:18:43+08:00">2018-09-19</time>
             
 
             
