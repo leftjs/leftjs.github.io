@@ -1,5 +1,5 @@
 ---
-title: Influx 存储
+title: Influx 存储方案
 date: 2018-09-19 16:18:43
 tags:
   - 分布式系统
@@ -116,3 +116,10 @@ InfluxDB 在经历了几个小版本的 BoltDB 后，最终决定自研 TSM，TS
 ## Disk-based Index
 
 针对全内存索引存在的这些问题，InfluxDB 在最新的 1.3 版本中提供了另外一种索引的实现。得益于代码设计上良好的扩展性，索引模块和存储引擎模块都是插件化的，用户可以在配置中自由选择使用哪种索引。
+
+![](./1b899ab617230fa5294160198546a6aa7d38e208.png)
+
+InfluxDB 实现了一个特殊的存储引擎来做索引数据的存储，其结构也与 LSM 类似，如上图就是一个 Disk-based Index 的结构图，详细的说明可以参见设计文档。
+索引数据会先写入 Write-Ahead-Log，WAL 中的数据按 LogEntry 组织，每个 LogEntry 对应一个 TimeSeries，包含 Measurement、Tags 以及 checksum 信息。写入 WAL 成功后，数据会进入一个内存索引结构内。当 WAL 积攒到一定大小后，LogFile 会 Flush 成 IndexFile。IndexFile 的逻辑结构与内存索引的结构一致，表示的也是 Measurement 到 TagKey，TagKey 到 TagValue，TagValue 到 TimeSeries 的 Map 结构。InfluxDB 会使用 mmap 来访问文件，同时文件中对每个 Map 都会保存 HashIndex 来加速查询。
+
+当 IndexFile 积攒到一定数量后，InfluxDB 也提供 compaction 的机制，将多个 IndexFile 合并为一个，节省存储空间以及加速查询。
