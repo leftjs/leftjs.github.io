@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.3.8"
+    "version": "3.7.1"
   },
   "scripts": {
     "preinstall": "if [ ! -d \"themes/next\" ]; then git clone https://github.com/iissnan/hexo-theme-next themes/next && cp _next_config_backup.yml themes/next/_config.yml; fi",
