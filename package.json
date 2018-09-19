@@ -6,7 +6,7 @@
     "version": "3.7.1"
   },
   "scripts": {
-    "preinstall": "if [ ! -d \"themes/next\" ]; then git clone https://github.com/iissnan/hexo-theme-next themes/next && cp _next_config_backup.yml themes/next/_config.yml; fi",
+    "preinstall": "if [ ! -d \"themes/next\" ]; then git clone https://github.com/theme-next/hexo-theme-next themes/next && cp _next_config_backup.yml themes/next/_config.yml; fi",
     "backup": "cp themes/next/_config.yml ./_next_config_backup.yml",
     "push": "git add . && git commit -m \"backup at `date`\" && git push origin backup",
     "deploy": "npm run backup && npm run push && hexo d --g"
