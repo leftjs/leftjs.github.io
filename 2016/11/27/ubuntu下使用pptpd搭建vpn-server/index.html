@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="简介由于桂电实验室上网需要 高额的 费用，考虑到实验室和宿舍的网络都是基于校园网来进行内网连接的，基于这一点，考虑在宿舍通过笔记本或树莓派设备来启动一个vpn服务器连接内网，然后再在宿舍的设备上将内外网进行桥接，即该设备可以同时上内外网，由于大多数笔记本或者树莓派都具有双网卡，所以采用无线网卡来接入一个已经具备上网功能的路由器，使用有线网卡连接内网。  2016-12-15 update最近又被2">
+<meta name="keywords" content="桂林电子科技大学,pptpd,vpn,网络配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ubuntu下使用pptpd搭建vpn-server">
+<meta property="og:url" content="http://yoursite.com/2016/11/27/ubuntu下使用pptpd搭建vpn-server/index.html">
+<meta property="og:site_name" content="Leftjs&#39;s Blog">
+<meta property="og:description" content="简介由于桂电实验室上网需要 高额的 费用，考虑到实验室和宿舍的网络都是基于校园网来进行内网连接的，基于这一点，考虑在宿舍通过笔记本或树莓派设备来启动一个vpn服务器连接内网，然后再在宿舍的设备上将内外网进行桥接，即该设备可以同时上内外网，由于大多数笔记本或者树莓派都具有双网卡，所以采用无线网卡来接入一个已经具备上网功能的路由器，使用有线网卡连接内网。  2016-12-15 update最近又被2">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-15T12:01:45.163Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ubuntu下使用pptpd搭建vpn-server">
+<meta name="twitter:description" content="简介由于桂电实验室上网需要 高额的 费用，考虑到实验室和宿舍的网络都是基于校园网来进行内网连接的，基于这一点，考虑在宿舍通过笔记本或树莓派设备来启动一个vpn服务器连接内网，然后再在宿舍的设备上将内外网进行桥接，即该设备可以同时上内外网，由于大多数笔记本或者树莓派都具有双网卡，所以采用无线网卡来接入一个已经具备上网功能的路由器，使用有线网卡连接内网。  2016-12-15 update最近又被2">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/11/27/ubuntu下使用pptpd搭建vpn-server/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ubuntu下使用pptpd搭建vpn-server | Leftjs's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leftjs's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/27/ubuntu下使用pptpd搭建vpn-server/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jason Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leftjs's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ubuntu下使用pptpd搭建vpn-server
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-11-27 12:58:48" itemprop="dateCreated datePublished" datetime="2016-11-27T12:58:48+08:00">2016-11-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-09-15 20:01:45" itemprop="dateModified" datetime="2018-09-15T20:01:45+08:00">2018-09-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/零碎的记录/" itemprop="url" rel="index"><span itemprop="name">零碎的记录</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>由于桂电实验室上网需要 <strong>高额的</strong> 费用，考虑到实验室和宿舍的网络都是基于校园网来进行内网连接的，基于这一点，考虑在宿舍通过笔记本或树莓派设备来启动一个vpn服务器连接内网，然后再在宿舍的设备上将内外网进行桥接，即该设备可以同时上内外网，由于大多数笔记本或者树莓派都具有双网卡，所以采用无线网卡来接入一个已经具备上网功能的路由器，使用有线网卡连接内网。</p>
+<blockquote>
+<p>2016-12-15 update<br>最近又被2.4g网络恶心到了，宿舍那边的无线信号真的是太多了，各种信道拥堵，而英产树莓派又不支持<strong>伟大的</strong>13信道和大陆5g频段，所以ping一直都有波动，考虑买大陆的usb无线网卡或有线网卡来接入5g网络或者有线网路提高树莓派外网连接的稳定性，当然宿舍不缺电(桂电宿舍普通用电还要自己交钱,无力吐槽)准备使用笔记本搭建的童鞋当我没说，因为新一点的笔记本都支持5g吧….</p>
+</blockquote>
+<h2 id="配置-永不掉线-的路由器"><a href="#配置-永不掉线-的路由器" class="headerlink" title="配置 永不掉线 的路由器"></a>配置 <em>永不掉线</em> 的路由器</h2><p>桂电宿舍的网线都是单网线三网通用的，其实原理很简单，就是在上层做了一下网关开放的工作，通过一个叫做出校器的工具，选择一个运营商，将拨号所用的mac地址和相关的运营商进行绑定，此后的所有的数据包都发往指定运营商的网关，基于这个原理，可以在实验室等能够连通内网的设备上定期进行相关端口开放的工作(前提是将该设备的mac修改为路由器的mac地址)，另外，这里推荐一个师大师兄编写的mac、linux、windows下的第三方出校器和端口开放工具<a href="https://github.com/xuzhipengnt/ipclient_gxnu" title="ipclient_gxnu" target="_blank" rel="noopener">ipclient_gxnu</a>,项目中的有详细的介绍和文档，推荐学习。此外，如果仅仅是需要进行运营商和mac地址的绑定的话，推荐使用桂电某学生编写的在线端口绑定网站:<a href="http://sec.guet.edu.cn/open/" title="http://sec.guet.edu.cn/open/" target="_blank" rel="noopener">http://sec.guet.edu.cn/open/</a>将路由mac地址和某运营商端口进行绑定</p>
+<h2 id="ubuntu发行版本选择"><a href="#ubuntu发行版本选择" class="headerlink" title="ubuntu发行版本选择"></a>ubuntu发行版本选择</h2><p>由于之前我用的是ubuntu的最新的发行版本，在dhcp的时候经常会出现三个默认路由的情况，我也没有深入研究原因，后来换到16.04LTS上后，同样的配置，dhcp后默认只有一个默认路由，所以推荐16.04LTS</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>安装pptpd<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install pptpd</span><br></pre></td></tr></table></figure></p>
+<p><del>配置虚拟ip，编辑/etc/pptpd.conf</del> ( <em>这一步可以不用做，因为python脚本中会覆盖</em> ):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">localip 10.20.39.111 # 本机ip</span><br><span class="line">remoteip 10.100.123.2-100 # 分配的ip段</span><br></pre></td></tr></table></figure></p>
+<p>在/etc/ppp/pptpd-options下中设置dns:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#根据实际情况设置dns</span><br><span class="line">ms-dns 192.168.199.1</span><br><span class="line">ms-dns 114.114.114.114</span><br></pre></td></tr></table></figure></p>
+<p>在/etc/ppp/chap-secrets中配置vpn账号:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;user&quot;  pptpd   &quot;user&quot;  * #星号是不限制ip的意思</span><br></pre></td></tr></table></figure></p>
+<p>不过默认情况下，pptpd无法给vpn连接分配ip，所以如果是多用户的话需要手动分配ip具体配置类似:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;user1&quot;   pptpd   &quot;user1&quot;   10.100.123.2</span><br><span class="line">&quot;user2&quot;   pptpd   &quot;user2&quot;   10.100.123.3</span><br></pre></td></tr></table></figure></p>
+<p>重启pptpd服务:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo /etc/init.d/pptpd restart</span><br></pre></td></tr></table></figure></p>
+<p>在/etc/sysctl.conf中配置ip转发(取消该行注释):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.ip_forward=1</span><br></pre></td></tr></table></figure></p>
+<p>使配置立即生效:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo sysctl -p</span><br></pre></td></tr></table></figure></p>
+<p>安装iptables,这个是用于配置NAT映射的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install iptables</span><br></pre></td></tr></table></figure></p>
+<p>建立一个外网NAT（外网走无线）:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo iptables -t nat -A POSTROUTING -s 10.100.123.0/24 -o wlo1 -j MASQUERADE</span><br></pre></td></tr></table></figure></p>
+<p>建立一个内网NAT（内网走有线）:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo iptables -t nat -A POSTROUTING -s 10.100.123.0/24 -d 172.16.0.0/16 -o eno1 -j MASQUERADE</span><br></pre></td></tr></table></figure></p>
+<p>其中-o参数配置的是流量的出口,也就是我这的外网出口<br>设置MTU,防止包过大而丢包:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo iptables -A FORWARD -s 10.100.123.0/24 -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1200</span><br></pre></td></tr></table></figure></p>
+<p>保存规则(此处需要root权限):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo iptables-save &gt;/etc/iptables-rules</span><br></pre></td></tr></table></figure></p>
+<p>编辑/etc/network/interfaces,在末尾加一行,使网卡加载时自动加载规则:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">per-up iptables-restore &lt;/etc/iptables-rules</span><br></pre></td></tr></table></figure></p>
+<p>配置到此为止</p>
+<h2 id="网卡名称修改问题"><a href="#网卡名称修改问题" class="headerlink" title="网卡名称修改问题"></a>网卡名称修改问题</h2><p>新版的ubuntu网卡名称都是随机的，可以自定义修改网卡的名称，比如本文章中，有线网卡为:wlo1， 无线网卡为:eno1。<br>默认，/etc/udev/rules.d/只有一个README文件。<br>新建了70-persistent-net.rules文件，然后编辑：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SUBSYSTEM==&quot;net&quot;, ACTION==&quot;add&quot;, ATTR&#123;address&#125;==&quot;44:33:4c:07:ad:48&quot;, NAME=&quot;eno1&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="服务器启动代码"><a href="#服务器启动代码" class="headerlink" title="服务器启动代码"></a>服务器启动代码</h2><h3 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h3><ol>
+<li>修改dhcp后的ip为静态ip</li>
+<li>添加内外网路由，默认情况下重启后路由表会丢失</li>
+<li>持续ping对方网关，保证服务器的稳定，推荐使用tmux来维持会话状态，保证程序存活</li>
+</ol>
+<h3 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h3><p>安装 <code>nodejs</code> 和 <code>npm</code> :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install nodejs npm</span><br></pre></td></tr></table></figure></p>
+<p>切换到 <code>/usr/bin</code> 目录下，建立一个 <code>node</code> 到 <code>nodejs</code> 的软连接，因为 <code>pm2</code> 启动时需要执行 <code>node</code> 命令:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/bin</span><br><span class="line">sudo ln -s ./node.js node</span><br></pre></td></tr></table></figure></p>
+<p>使用 <code>npm</code> 安装 <code>pm2</code> :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo npm install -g pm2</span><br></pre></td></tr></table></figure></p>
+<p>使用 <code>pm2</code> 启动项目，并将其加入开启自启中:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd vpn_launch</span><br><span class="line">pm2 start ./launch.py --name=&quot;vpn&quot;</span><br><span class="line">pm2 save</span><br><span class="line">pm2 startup</span><br></pre></td></tr></table></figure></p>
+<p>至此，您的pc、树莓派已经具有了开机自启、daemon、线路自检等功能，理论上已经不会掉线<br>代码地址:<a href="https://github.com/leftjs/vpn_launch" title="leftjs/vpn_launch" target="_blank" rel="noopener">leftjs/vpn_launch</a></p>
+<p>launch.py:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> socket, fcntl, struct</span><br><span class="line"><span class="keyword">import</span> commands</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"><span class="keyword">from</span> email.mime.text <span class="keyword">import</span> MIMEText</span><br><span class="line"><span class="keyword">from</span> email.header <span class="keyword">import</span> Header</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第三方 SMTP 服务</span></span><br><span class="line">mail_host=<span class="string">"smtp.qq.com"</span>  <span class="comment">#设置服务器</span></span><br><span class="line">mail_user=<span class="string">"leftjs@foxmail.com"</span>    <span class="comment">#用户名</span></span><br><span class="line">mail_pass=<span class="string">"xxxx"</span>   <span class="comment">#授权口令</span></span><br><span class="line">sender = <span class="string">'leftjs@foxmail.com'</span></span><br><span class="line">receivers = [<span class="string">'lefttjs@gmail.com'</span>]  <span class="comment"># 接收邮件，可设置为你的QQ邮箱或者其他邮箱</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(text)</span>:</span></span><br><span class="line">    message = MIMEText(<span class="string">'%s'</span> % text, <span class="string">'plain'</span>, <span class="string">'utf-8'</span>)</span><br><span class="line">    message[<span class="string">'From'</span>] = Header(<span class="string">"leftjs"</span>, <span class="string">'utf-8'</span>)</span><br><span class="line">    message[<span class="string">'To'</span>] =  Header(<span class="string">"jason zhang"</span>, <span class="string">'utf-8'</span>)</span><br><span class="line">    subject = <span class="string">'vpn 报告'</span></span><br><span class="line">    message[<span class="string">'Subject'</span>] = Header(subject, <span class="string">'utf-8'</span>)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        smtpObj = smtplib.SMTP_SSL()</span><br><span class="line">        smtpObj.connect(mail_host, <span class="number">465</span>)    <span class="comment"># 25 为 SMTP 端口号</span></span><br><span class="line">        smtpObj.login(mail_user,mail_pass)</span><br><span class="line">        smtpObj.sendmail(sender, receivers, message.as_string())</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"邮件发送成功"</span></span><br><span class="line">    <span class="keyword">except</span> smtplib.SMTPException:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Error: 无法发送邮件"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_local_ip</span><span class="params">(ifname)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span><br><span class="line">        inet = fcntl.ioctl(s.fileno(), <span class="number">0x8915</span>, struct.pack(<span class="string">'256s'</span>, ifname[:<span class="number">15</span>]))</span><br><span class="line">        <span class="keyword">return</span> socket.inet_ntoa(inet[<span class="number">20</span>:<span class="number">24</span>])</span><br><span class="line">    <span class="keyword">except</span> Exception, e:</span><br><span class="line">        send_email(str(e))</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_ping</span><span class="params">()</span>:</span></span><br><span class="line">    (ping_state, res) = commands.getstatusoutput(<span class="string">'ping 202.193.75.254 -c 2'</span>)</span><br><span class="line">    <span class="comment"># (ping_state_baidu, res_baidu) = commands.getstatusoutput('ping www.baidu.com -c 2')</span></span><br><span class="line">    <span class="comment"># ping_state == 0 when ping is ok</span></span><br><span class="line">    <span class="comment"># return True if ping_state == 0 and ping_state_baidu == 0 else False</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">True</span> <span class="keyword">if</span> ping_state == <span class="number">0</span> <span class="keyword">else</span> <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_file_content</span><span class="params">(file_name)</span>:</span></span><br><span class="line">    the_file = open(file_name, <span class="string">'r'</span>)</span><br><span class="line">    file_content = the_file.read()</span><br><span class="line">    the_file.close()</span><br><span class="line">    <span class="keyword">return</span> file_content</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_file_content</span><span class="params">(file_name, new_content)</span>:</span></span><br><span class="line">    out_file = open(file_name, <span class="string">'w'</span>)</span><br><span class="line">    out_file.write(new_content)</span><br><span class="line">    out_file.close()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_interfaces_static_file</span><span class="params">(intranet_ip)</span>:</span></span><br><span class="line">    raw_content = read_file_content(<span class="string">'./interfaces/raw_interfaces_static'</span>)</span><br><span class="line">    write_file_content(<span class="string">'./interfaces/interfaces_static'</span>, raw_content % intranet_ip)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">restart_pptpd</span><span class="params">(intranet_ip)</span>:</span></span><br><span class="line">    raw_content = read_file_content(<span class="string">'./pptpd/raw_pptpd.conf'</span>)</span><br><span class="line">    write_file_content(<span class="string">'./pptpd/pptpd.conf'</span>, raw_content % intranet_ip)</span><br><span class="line">    commands.getstatusoutput(<span class="string">'cp -f ./pptpd/pptpd.conf /etc/pptpd.conf'</span>)</span><br><span class="line">    commands.getstatusoutput(<span class="string">'sudo /etc/init.d/pptpd restart'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">restart_dnsmasq</span><span class="params">(intranet_ip)</span>:</span></span><br><span class="line">    raw_content = read_file_content(<span class="string">'./dns/raw_dnsmasq.conf'</span>)</span><br><span class="line">    write_file_content(<span class="string">'./dns/dnsmasq.conf'</span>, raw_content % intranet_ip)</span><br><span class="line">    commands.getstatusoutput(<span class="string">'cp -f ./dns/dnsmasq.conf /etc/dnsmasq.conf'</span>)</span><br><span class="line">    commands.getstatusoutput(<span class="string">'service dnsmasq restart'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_route_item</span><span class="params">()</span>:</span></span><br><span class="line">    commands.getstatusoutput(<span class="string">'ip route add 202.193.0.0/16 via 10.20.40.254 dev eno1'</span>)</span><br><span class="line">    commands.getstatusoutput(<span class="string">'ip route add 10.100.123.0/24 via 10.20.40.254 dev eno1'</span>)</span><br><span class="line">    commands.getstatusoutput(<span class="string">'ip route add 10.20.0.0/16 via 10.20.40.254 dev eno1'</span>)</span><br><span class="line">    commands.getstatusoutput(<span class="string">'ip route add 172.16.0.0/16 via 10.20.40.254 dev eno1'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    old_ip = <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        ping_state = check_ping()</span><br><span class="line">        <span class="keyword">if</span> ping_state == <span class="keyword">False</span> <span class="keyword">or</span> old_ip == <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">print</span> time.strftime(<span class="string">'%Y-%m-%d %H:%M:%S'</span>,time.localtime(time.time()))</span><br><span class="line">            <span class="keyword">print</span> <span class="string">'network restart.'</span></span><br><span class="line">            commands.getstatusoutput(<span class="string">'dhclient eno1'</span>)</span><br><span class="line">            <span class="comment"># get new intranet ip</span></span><br><span class="line">            intranet_ip = get_local_ip(<span class="string">"eno1"</span>)</span><br><span class="line">            <span class="keyword">if</span> intranet_ip <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">if</span> old_ip == <span class="keyword">None</span> <span class="keyword">or</span> old_ip != intranet_ip:</span><br><span class="line">                <span class="keyword">print</span> <span class="string">'new ip: '</span>,intranet_ip</span><br><span class="line">                send_email(<span class="string">'新的ip为: %s'</span> % intranet_ip)</span><br><span class="line">                create_interfaces_static_file(intranet_ip)</span><br><span class="line">                restart_pptpd(intranet_ip)</span><br><span class="line">                <span class="comment"># restart_dnsmasq(intranet_ip)</span></span><br><span class="line">                old_ip = intranet_ip</span><br><span class="line">            commands.getstatusoutput(<span class="string">'cp -f ./interfaces/interfaces_static /etc/network/interfaces'</span>)</span><br><span class="line">            commands.getstatusoutput(<span class="string">'/etc/init.d/networking restart'</span>)</span><br><span class="line">            <span class="comment"># commands.getstatusoutput('dhclient eth0')</span></span><br><span class="line">            <span class="comment"># commands.getstatusoutput('cp -f ./dns/resolv.conf /etc/resolv.dnsmasq.conf')</span></span><br><span class="line">            add_route_item()</span><br><span class="line">            time.sleep(<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">print</span> <span class="string">'config complete.'</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        time.sleep(<span class="number">2</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="寝室ip扫描代码"><a href="#寝室ip扫描代码" class="headerlink" title="寝室ip扫描代码"></a>寝室ip扫描代码</h2><p>在实验室连入校内网批量ping宿舍ip，找出自己的主机。</p>
+<p>ping_test.py:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="keyword">from</span> Queue <span class="keyword">import</span> Queue</span><br><span class="line"></span><br><span class="line">num_threads = <span class="number">100</span></span><br><span class="line">queue = Queue()</span><br><span class="line">ips = [<span class="string">'10.20.38.'</span> + str(a) <span class="keyword">for</span> a <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">255</span>)] + [<span class="string">'10.20.39.'</span> + str(a) <span class="keyword">for</span> a <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">255</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment">#wraps system ping command</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pinger</span><span class="params">(i, q)</span>:</span></span><br><span class="line">    <span class="string">"""Pings subnet"""</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        ip = q.get()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Thread %s: Pinging %s"</span> % (i, ip)</span><br><span class="line">        ret = subprocess.call(<span class="string">"ping -c 1 %s"</span> % ip,</span><br><span class="line">            shell=<span class="keyword">True</span>,</span><br><span class="line">            stdout=open(<span class="string">'/dev/null'</span>, <span class="string">'w'</span>),</span><br><span class="line">            stderr=subprocess.STDOUT)</span><br><span class="line">        <span class="keyword">if</span> ret == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">print</span> <span class="string">"%s: is alive"</span> % ip</span><br><span class="line">            <span class="keyword">with</span> open(<span class="string">'./result.txt'</span>, <span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">                f.write(<span class="string">"%s: is alive\n"</span> % ip)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">print</span> <span class="string">"%s: did not respond"</span> % ip</span><br><span class="line">        q.task_done()</span><br><span class="line"><span class="comment">#Spawn thread pool</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(num_threads):</span><br><span class="line">    worker = Thread(target=pinger, args=(i, queue))</span><br><span class="line">    worker.setDaemon(<span class="keyword">True</span>)</span><br><span class="line">    worker.start()</span><br><span class="line"><span class="comment">#Place work in queue</span></span><br><span class="line"><span class="keyword">for</span> ip <span class="keyword">in</span> ips:</span><br><span class="line">    queue.put(ip)</span><br><span class="line"><span class="comment">#Wait until worker threads are done to exit</span></span><br><span class="line">queue.join()</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/桂林电子科技大学/" rel="tag"># 桂林电子科技大学</a>
+          
+            <a href="/tags/pptpd/" rel="tag"># pptpd</a>
+          
+            <a href="/tags/vpn/" rel="tag"># vpn</a>
+          
+            <a href="/tags/网络配置/" rel="tag"># 网络配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/10/js中加号特殊用法一览/" rel="prev" title="js中加号特殊用法一览">
+                js中加号特殊用法一览 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jason Zhang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-永不掉线-的路由器"><span class="nav-number">2.</span> <span class="nav-text">配置 永不掉线 的路由器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ubuntu发行版本选择"><span class="nav-number">3.</span> <span class="nav-text">ubuntu发行版本选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">4.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网卡名称修改问题"><span class="nav-number">5.</span> <span class="nav-text">网卡名称修改问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器启动代码"><span class="nav-number">6.</span> <span class="nav-text">服务器启动代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#目的"><span class="nav-number">6.1.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动方式"><span class="nav-number">6.2.</span> <span class="nav-text">启动方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#寝室ip扫描代码"><span class="nav-number">7.</span> <span class="nav-text">寝室ip扫描代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jason Zhang</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
