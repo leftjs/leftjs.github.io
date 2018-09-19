@@ -197,7 +197,7 @@ avatar:
   # The value of opacity should be choose from 0 to 1 to set the opacity of the avatar.
   opacity: 1
   # If true, the avatar would be rotated with the cursor.
-  rotated: true
+  rotated: false
 
 # Table Of Contents in the Sidebar
 toc:
