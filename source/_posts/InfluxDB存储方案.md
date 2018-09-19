@@ -1,5 +1,5 @@
 ---
-title: Influx 存储方案
+title: InfluxDB 存储方案
 date: 2018-09-19 16:18:43
 tags:
   - 分布式系统
