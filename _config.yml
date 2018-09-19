@@ -3,19 +3,19 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Leftjs's Blog
-subtitle:
-description:
+title: leftjs's Blog
+? subtitle
+? description
 author: Jason Zhang
 language: zh-Hans
-timezone:
+? timezone
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: http://yoursite.com
 root: /
 permalink: :year/:month/:day/:title/
-permalink_defaults:
+? permalink_defaults
 
 # Directory
 source_dir: source
@@ -25,7 +25,7 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-skip_render:
+? skip_render
 
 # Writing
 new_post_name: :title.md # File name of new posts
@@ -41,12 +41,12 @@ highlight:
   enable: true
   line_number: true
   auto_detect: false
-  tab_replace:
+  ? tab_replace
 
 # Category & Tag
 default_category: uncategorized
-category_map:
-tag_map:
+? category_map
+? tag_map
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
