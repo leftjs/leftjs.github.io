@@ -1,5 +1,5 @@
 ---
-title: TSM 存储方案
+title: Influx 存储
 date: 2018-09-19 16:18:43
 tags:
   - 分布式系统
@@ -49,3 +49,70 @@ InfluxDB 在经历了几个小版本的 BoltDB 后，最终决定自研 TSM，TS
    - **LevelCompaction**: InfluxDB 将 TSM 文件分为 4 个层级(Level 1-4)，compaction 只会发生在同层级文件内，同层级的文件 compaction 后会晋升到下一层级。从这个规则看，根据时序数据的产生特性，level 越高数据生成时间越旧，访问热度越低。由 Cache 数据初次生成的 TSM 文件称为 Snapshot，多个 Snapshot 文件 compaction 后产生 Level1 的 TSM 文件，Level1 的文件 compaction 后生成 level2 的文件，依次类推。低 Level 和高 Level 的 compaction 会采用不同的算法，低 level 文件的 compaction 采用低 CPU 消耗的做法，例如不会做解压缩和 block 合并，而高 level 文件的 compaction 则会做 block 解压缩以及 block 合并，以进一步提高压缩率。我理解这种设计是一种权衡，compaction 通常在后台工作，为了不影响实时的数据写入，对 compaction 消耗的资源是有严格的控制，资源受限的情况下必然会影响 compaction 的速度。而 level 越低的数据越新，热度也越高，需要有一种更快的加速查询的 compaction，所以 InfluxDB 在低 level 采用低资源消耗的 compaction 策略，这完全是贴合时序数据的写入和查询特性来设计的。
    - **IndexOptimizationCompaction**: 当 Level4 的文件积攒到一定个数后，index 会变得很大，查询效率会变的比较低。影响查询效率低的因素主要在于同一个 TimeSeries 数据会被多个 TSM 文件所包含，所以查询不可避免的需要跨多个文件进行数据整合。所以 IndexOptimizationCompaction 的主要作用就是将同一 TimeSeries 下的数据合并到同一个 TSM 文件中，尽量减少不同 TSM 文件间的 TimeSeries 重合度。
    - **FullCompaction**: InfluxDB 在判断某个 Shard 长时间内不会再有数据写入之后，会对数据做一次 FullCompaction。FullCompaction 是 LevelCompaction 和 IndexOptimization 的整合，在做完一次 FullCompaction 之后，这个 Shard 不会再做任何的 compaction，除非有新的数据写入或者删除发生。这个策略是对冷数据的一个规整，主要目的在于提高压缩率。
+
+# TimeSeries Index
+
+时序数据库除了支撑时序数据的存储和计算外，还需要能够提供多维度查询。InfluxDB 为了提供更快速的多维查询，对 TimeSeries 进行了索引。关于数据和索引，InfluxDB 是这么描述自己的：
+
+> InfluxDB actually looks like two databases in one: a time series data store and an inverted index for the measurement, tag, and field metadata.
+
+在 InfluxDB 1.3 之前，TimeSeries Index(下面简称为 TSI)只支持 Memory-based 的方式，即所有的 TimeSeries 的索引都是放在内存内，这种方式有好处但是也会带来很多的问题。而在最新发布的 InfluxDB 1.3 版本上，提供了另外一种方式的索引可供选择，新的索引方式会把索引存储在磁盘上，效率上相比内存索引差一点，但是解决了内存索引存在的不少问题。
+
+## Memory-based Index
+
+```go
+// Measurement represents a collection of time series in a database. It also
+    // contains in memory structures for indexing tags. Exported functions are
+    // goroutine safe while un-exported functions assume the caller will use the
+    // appropriate locks.
+    type Measurement struct {
+     database string
+     Name     string `json:"name,omitempty"`
+     name     []byte // cached version as []byte
+
+     mu         sync.RWMutex
+     fieldNames map[string]struct{}
+
+     // in-memory index fields
+     seriesByID          map[uint64]*Series              // lookup table for series by their id
+     seriesByTagKeyValue map[string]map[string]SeriesIDs // map from tag key to value to sorted set of series ids
+
+     // lazyily created sorted series IDs
+     sortedSeriesIDs SeriesIDs // sorted list of series IDs in this measurement
+    }
+
+    // Series belong to a Measurement and represent unique time series in a database.
+    type Series struct {
+     mu          sync.RWMutex
+     Key         string
+     tags        models.Tags
+     ID          uint64
+     measurement *Measurement
+     shardIDs    map[uint64]struct{} // shards that have this series defined
+    }
+```
+
+如上是 InfluxDB 1.3 的源码中对内存索引数据结构的定义，主要有两个重要的数据结构体：
+
+**Series**: 对应某个 TimeSeries，其内存储 TimeSeries 相关的一些基本属性以及它所属的 Shard
+
+- Key：对应 measurement + tags 序列化后的字符串。
+- tags: 该 TimeSeries 下所有的 TagKey 和 TagValue
+- ID: 用于唯一区分的整数 ID。
+- measurement: 所属的 measurement。
+- shardIDs: 所有包含该 Series 的 ShardID 列表。
+
+**Measurement**: 每个 measurement 在内存中都会对应一个 Measurement 结构，其内部主要是一些索引来加速查询。
+
+- seriesByID：通过 SeriesID 查询 Series 的一个 Map。
+- seriesByTagKeyValue：双层 Map，第一层是 TagKey 对应其所有的 TagValue，第二层是 TagValue 对应的所有 Series 的 ID。可以看到，当 TimeSeries 的基数变得很大，这个 map 所占的内存会相当多。
+- sortedSeriesIDs：一个排序的 SeriesID 列表。
+
+全内存索引结构带来的好处是能够提供非常高效的多维查询，但是相应的也会存在一些问题：
+
+- 能够支持的 TimeSeries 基数有限，主要受限于内存的大小。若 TimeSeries 个数超过上限，则整个数据库会处于不可服务的状态。这类问题一般由用户错误的设计 TagKey 引发，例如某个 TagKey 是一个随机的 ID。一旦遇到这个问题的话，也很难恢复，往往只能通过手动删数据。
+- 若进程重启，恢复数据的时间会比较长，因为需要从所有的 TSM 文件中加载全量的 TimeSeries 信息来在内存中构建索引。
+
+## Disk-based Index
+
+针对全内存索引存在的这些问题，InfluxDB 在最新的 1.3 版本中提供了另外一种索引的实现。得益于代码设计上良好的扩展性，索引模块和存储引擎模块都是插件化的，用户可以在配置中自由选择使用哪种索引。
