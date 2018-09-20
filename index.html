@@ -339,7 +339,7 @@
                 
               
 
-              <time title="Created: 2018-09-20 12:41:59 / Modified: 14:12:44" itemprop="dateCreated datePublished" datetime="2018-09-20T12:41:59+08:00">2018-09-20</time>
+              <time title="Created: 2018-09-20 12:41:59 / Modified: 14:15:42" itemprop="dateCreated datePublished" datetime="2018-09-20T12:41:59+08:00">2018-09-20</time>
             
 
             
@@ -407,7 +407,7 @@
 <h2 id="influx-inspect-buildtsi"><a href="#influx-inspect-buildtsi" class="headerlink" title="influx_inspect buildtsi"></a><code>influx_inspect buildtsi</code></h2><p>如果要将现有分片从内存中索引转换为 TSI 索引，或者如果现有 TSI 索引已损坏，则可以使用<code>buildtsi</code>命令从基础 TSM 数据创建索引。如果您要重建现有 TSI 索引，请首先删除分片中的<code>index</code>目录。</p>
 <p>此命令在服务器级别工作，但您可以选择添加数据库，保留策略和分片筛选器以仅应用于分片子集。</p>
 <p>有关此命令的详细信息，请参阅<a href="https://docs.influxdata.com/influxdb/v1.6/tools/influx_inspect/#influx-inspect-buildtsi" target="_blank" rel="noopener">Influx inspect buildtsi</a></p>
-<h1 id="理解-TSI"><a href="#理解-TSI" class="headerlink" title="理解 TSI"></a>理解 TSI</h1><h2 id="文件组织"><a href="#文件组织" class="headerlink" title="文件组织"></a>文件组织</h2><p>TSI（时间序列索引）基于日志合并树(LSMT)，用于 InfluxDB 中存储时间序列。 TSI 由几个部分组成：</p>
+<h1 id="Understanding-TSI"><a href="#Understanding-TSI" class="headerlink" title="Understanding TSI"></a>Understanding TSI</h1><h2 id="File-organization"><a href="#File-organization" class="headerlink" title="File organization"></a>File organization</h2><p>TSI（时间序列索引）基于日志合并树(LSMT)，用于 InfluxDB 中存储时间序列。 TSI 由几个部分组成：</p>
 <ul>
 <li><strong>Index</strong>：包含单个分片(shard)的整个索引数据集。</li>
 <li><strong>Partition</strong>：包含分片数据的分片分区。</li>
