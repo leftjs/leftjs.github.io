@@ -33,9 +33,9 @@ categories: 数据库
 
 有关此命令的详细信息，请参阅[Influx inspect buildtsi](https://docs.influxdata.com/influxdb/v1.6/tools/influx_inspect/#influx-inspect-buildtsi)
 
-# 理解 TSI
+# Understanding TSI
 
-## 文件组织
+## File organization
 
 TSI（时间序列索引）基于日志合并树(LSMT)，用于 InfluxDB 中存储时间序列。 TSI 由几个部分组成：
 
