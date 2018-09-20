@@ -339,7 +339,7 @@
                 
               
 
-              <time title="Created: 2018-09-20 12:41:59 / Modified: 14:15:42" itemprop="dateCreated datePublished" datetime="2018-09-20T12:41:59+08:00">2018-09-20</time>
+              <time title="Created: 2018-09-20 12:41:59 / Modified: 14:21:43" itemprop="dateCreated datePublished" datetime="2018-09-20T12:41:59+08:00">2018-09-20</time>
             
 
             
@@ -440,7 +440,6 @@
 <li>相交：仅返回两个迭代器中同时存在的项。</li>
 <li>不同：仅返回在第一个迭代器中存在，在第二个迭代器中不存在的项。</li>
 </ul>
-<p>例如，具有区域！=’us-west’的 WHERE 子句的查询将跨两个分片操作，将构造一组迭代器，如下所示：</p>
 <p>例如，诸如跨两个分片的 WHERE 子句的查询 <code>region != &#39;us-west&#39;</code>,该构造一组类似如下的迭代器:</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">DifferenceSeriesIDIterators(</span><br><span class="line">    MergeSeriesIDIterators(</span><br><span class="line">        Shard1.MeasurementSeriesIDIterator(<span class="string">"m"</span>),</span><br><span class="line">        Shard2.MeasurementSeriesIDIterator(<span class="string">"m"</span>),</span><br><span class="line">    ),</span><br><span class="line">    MergeSeriesIDIterators(</span><br><span class="line">        Shard1.TagValueSeriesIDIterator(<span class="string">"m"</span>, <span class="string">"region"</span>, <span class="string">"us-west"</span>),</span><br><span class="line">        Shard2.TagValueSeriesIDIterator(<span class="string">"m"</span>, <span class="string">"region"</span>, <span class="string">"us-west"</span>),</span><br><span class="line">    ),</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 <h2 id="Log-File-Structure"><a href="#Log-File-Structure" class="headerlink" title="Log File Structure"></a>Log File Structure</h2><p>日志文件简单地构造为按顺序写入磁盘的 LogEntry 对象列表。一旦达到 5MB 则写入日志文件，然后将它们压缩为索引文件。日志中的条目对象可以是以下任何类型：</p>
