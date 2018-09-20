@@ -108,20 +108,25 @@
 
 
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="leftjs&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/tags/分布式系统/index.html">
+  <meta name="description" content="背景OpenTSDB 在 Tags 检索上做了不少的查询优化，但是受限于 HBase 的功能和数据模型，所以效果并不好。 构想使用 golang 实现高效的读写缓存与内存索引中间件，对上提供高效的 grpc 调用接口，对下利用 native go hbase client 将 level 0 级别 datapoints">
+<meta name="keywords" content="索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SkyTSDB索引方案设计">
+<meta property="og:url" content="http://yoursite.com/2018/09/20/SkyTSDB索引方案设计/index.html">
 <meta property="og:site_name" content="leftjs&#39;s Blog">
+<meta property="og:description" content="背景OpenTSDB 在 Tags 检索上做了不少的查询优化，但是受限于 HBase 的功能和数据模型，所以效果并不好。 构想使用 golang 实现高效的读写缓存与内存索引中间件，对上提供高效的 grpc 调用接口，对下利用 native go hbase client 将 level 0 级别 datapoints">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-20T04:42:50.523Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="leftjs&#39;s Blog">
+<meta name="twitter:title" content="SkyTSDB索引方案设计">
+<meta name="twitter:description" content="背景OpenTSDB 在 Tags 检索上做了不少的查询优化，但是受限于 HBase 的功能和数据模型，所以效果并不好。 构想使用 golang 实现高效的读写缓存与内存索引中间件，对上提供高效的 grpc 调用接口，对下利用 native go hbase client 将 level 0 级别 datapoints">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/分布式系统/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/09/20/SkyTSDB索引方案设计/"/>
 
 
 
@@ -131,7 +136,7 @@
   };
 </script>
 
-  <title>Tag: 分布式系统 | leftjs's Blog</title>
+  <title>SkyTSDB索引方案设计 | leftjs's Blog</title>
   
 
 
@@ -178,7 +183,7 @@
     
   
 
-  <div class="container sidebar-position-right ">
+  <div class="container sidebar-position-right page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -223,7 +228,7 @@
         
         
           
-          <li class="menu-item menu-item-tags menu-item-active">
+          <li class="menu-item menu-item-tags">
     <a href="/tags/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
   </li>
@@ -272,81 +277,196 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>分布式系统<small>Tag</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
+
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/20/SkyTSDB索引方案设计/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jason Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="leftjs's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/09/19/InfluxDB存储方案/" itemprop="url">
-              
-                <span itemprop="name">InfluxDB 存储方案</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">SkyTSDB索引方案设计
+              
+            
+          </h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-09-19T16:18:43+08:00"
-              content="2018-09-19" >
-          09-19
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
 
-    </header>
-  </article>
+            
+            
+            
 
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-09-20 11:48:37 / Modified: 12:42:50" itemprop="dateCreated datePublished" datetime="2018-09-20T11:48:37+08:00">2018-09-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据库/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>OpenTSDB 在 Tags 检索上做了不少的查询优化，但是受限于 HBase 的功能和数据模型，所以效果并不好。</p>
+<h1 id="构想"><a href="#构想" class="headerlink" title="构想"></a>构想</h1><p>使用 golang 实现高效的读写缓存与内存索引中间件，对上提供高效的 grpc 调用接口，对下利用 native go hbase client 将 level 0 级别 datapoints</p>
 
       
     </div>
 
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/索引/" rel="tag"># 索引</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/19/InfluxDB存储方案/" rel="next" title="InfluxDB 存储方案">
+                <i class="fa fa-chevron-left"></i> InfluxDB 存储方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/20/Time-Series-Index-TSI-设计细节/" rel="prev" title="Time-Series-Index(TSI)设计细节">
+                Time-Series-Index(TSI)设计细节 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -367,8 +487,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -463,6 +592,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构想"><span class="nav-number">2.</span> <span class="nav-text">构想</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -600,6 +745,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
 
   
 
