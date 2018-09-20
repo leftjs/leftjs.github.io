@@ -1,5 +1,5 @@
 ---
-title: Time-Series-Index(TSI)设计细节
+title: Time Series Index(TSI) 设计细节
 date: 2018-09-20 12:41:59
 tags:
   - 索引
