@@ -293,6 +293,202 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/23/数据结构——树/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jason Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="leftjs's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/23/数据结构——树/" itemprop="url">
+                  数据结构——树
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-09-23 19:06:15" itemprop="dateCreated datePublished" datetime="2018-09-23T19:06:15+08:00">2018-09-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-09-24 11:51:17" itemprop="dateModified" datetime="2018-09-24T11:51:17+08:00">2018-09-24</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>本文主要介绍一些二叉树结构，代码语言为 golang，地址:</p>
+<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><blockquote>
+<p>二叉树（Binary Tree）是包含 n 个节点的有限集合，该集合或者为空集（此时，二叉树称为空树），或者由一个根节点和两棵互不相交的、分别称为根节点的左子树和右子树的二叉树组成。</p>
+</blockquote>
+<h3 id="二叉查找树"><a href="#二叉查找树" class="headerlink" title="二叉查找树"></a>二叉查找树</h3><p>满足左大右小即可，是一种非常简单的二叉树</p>
+<ol>
+<li>插入使用递归，从上到下查找新节点在树种的合适位置</li>
+<li>删除时候需分以下三种情况进行考虑:<br><img src="/images/2018/09/bst-delete.png" alt="bst-delete"></li>
+</ol>
+<h3 id="AVL-树"><a href="#AVL-树" class="headerlink" title="AVL 树"></a>AVL 树</h3><p>AVL 树的基本操作一般涉及运作同在不平衡的二叉查找树所运作的同样的算法。但是要进行预先或随后做一次或多次所谓的”AVL 旋转”。</p>
+<ol>
+<li><p>插入<br>以下图表以四列表示四种情况，每行表示在该种情况下要进行的操作。在左左和右右的情况下，只需要进行一次旋转操作；在左右和右左的情况下，需要进行两次旋转操作。<br><img src="/images/2018/09/avl-insert.png" alt="avl-insert"></p>
+</li>
+<li><p>删除<br>从 AVL 树中删除，可以通过把要删除的节点向下旋转成一个叶子节点，接着直接移除这个叶子节点来完成。因为在旋转成叶子节点期间最多有 log n 个节点被旋转，而每次 AVL 旋转耗费固定的时间，所以删除处理在整体上耗费 O(log n) 时间。</p>
+</li>
+<li>搜索<br>可以像普通二叉查找树一样的进行，所以耗费 O(log n)时间，因为 AVL 树总是保持平衡的。不需要特殊的准备，树的结构不会由于查找而改变。（这是与伸展树搜索相对立的，它会因为搜索而变更树结构。）</li>
+</ol>
+<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><h2 id="B-树"><a href="#B-树" class="headerlink" title="B 树"></a>B 树</h2><h3 id="B-树-1"><a href="#B-树-1" class="headerlink" title="B+树"></a>B+树</h3><h3 id="B-树-2"><a href="#B-树-2" class="headerlink" title="B*树"></a>B*树</h3><h2 id="Trie-树"><a href="#Trie-树" class="headerlink" title="Trie 树"></a>Trie 树</h2><h3 id="HAT-Trie"><a href="#HAT-Trie" class="headerlink" title="HAT-Trie"></a>HAT-Trie</h3><h2 id="前缀树"><a href="#前缀树" class="headerlink" title="前缀树"></a>前缀树</h2><h3 id="Generalized-Prefix-Tree-GPT"><a href="#Generalized-Prefix-Tree-GPT" class="headerlink" title="Generalized Prefix Tree (GPT)"></a>Generalized Prefix Tree (GPT)</h3><h2 id="后缀树"><a href="#后缀树" class="headerlink" title="后缀树"></a>后缀树</h2><h2 id="Succinct-Trie"><a href="#Succinct-Trie" class="headerlink" title="Succinct Trie"></a>Succinct Trie</h2><h2 id="基数-Radix-树"><a href="#基数-Radix-树" class="headerlink" title="基数(Radix)树"></a>基数(Radix)树</h2><h3 id="ART-树"><a href="#ART-树" class="headerlink" title="ART 树"></a>ART 树</h3><h3 id="KISS-树"><a href="#KISS-树" class="headerlink" title="KISS 树"></a>KISS 树</h3><h2 id="FAST-树"><a href="#FAST-树" class="headerlink" title="FAST 树"></a>FAST 树</h2><ol>
+<li>pointer-free</li>
+<li>no online</li>
+<li>k-ary</li>
+<li>GPU implementation</li>
+</ol>
+<h2 id="T-树"><a href="#T-树" class="headerlink" title="T 树"></a>T 树</h2><h2 id="R-树"><a href="#R-树" class="headerlink" title="R 树"></a>R 树</h2><h3 id="R-树-1"><a href="#R-树-1" class="headerlink" title="R+树"></a>R+树</h3><h3 id="R-树-2"><a href="#R-树-2" class="headerlink" title="R*树"></a>R*树</h3><h3 id="QR-树"><a href="#QR-树" class="headerlink" title="QR 树"></a>QR 树</h3><h3 id="SS-树"><a href="#SS-树" class="headerlink" title="SS 树"></a>SS 树</h3><h3 id="X-树"><a href="#X-树" class="headerlink" title="X 树"></a>X 树</h3><h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li>[Data Structure] 数据结构中各种树 <a href="http://www.cnblogs.com/maybe2030/p/4732377.html" target="_blank" rel="noopener">http://www.cnblogs.com/maybe2030/p/4732377.html</a></li>
+<li>ART<a href="https://db.in.tum.de/~leis/papers/ART.pdf" target="_blank" rel="noopener">https://db.in.tum.de/~leis/papers/ART.pdf</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/20/Time-Series-Index-TSI-设计细节/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -568,12 +764,24 @@
                 
               
 
-              <time title="Created: 2018-09-19 16:18:43 / Modified: 23:03:22" itemprop="dateCreated datePublished" datetime="2018-09-19T16:18:43+08:00">2018-09-19</time>
+              <time title="Created: 2018-09-19 16:18:43" itemprop="dateCreated datePublished" datetime="2018-09-19T16:18:43+08:00">2018-09-19</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-09-20 14:38:48" itemprop="dateModified" datetime="2018-09-20T14:38:48+08:00">2018-09-20</time>
               
             
           </span>
@@ -981,7 +1189,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-count">4</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -998,7 +1206,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">categories</span>
                   </a>
                 </div>
@@ -1033,7 +1243,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">10</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">12</span>
                     <span class="site-state-item-name">tags</span>
                   </a>
                 </div>
