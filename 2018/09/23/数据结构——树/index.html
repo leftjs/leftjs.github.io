@@ -119,7 +119,7 @@
 <meta property="og:image" content="http://yoursite.com/images/2018/09/bst-delete.png">
 <meta property="og:image" content="http://yoursite.com/images/2018/09/avl-insert.png">
 <meta property="og:image" content="http://yoursite.com/images/2018/09/radix-tree.png">
-<meta property="og:updated_time" content="2018-09-24T04:14:55.977Z">
+<meta property="og:updated_time" content="2018-09-24T04:17:28.766Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据结构——树">
 <meta name="twitter:description" content="介绍本文主要介绍一些二叉树结构，代码语言为 golang，地址: 二叉树 二叉树（Binary Tree）是包含 n 个节点的有限集合，该集合或者为空集（此时，二叉树称为空树），或者由一个根节点和两棵互不相交的、分别称为根节点的左子树和右子树的二叉树组成。  二叉查找树满足左大右小即可，是一种非常简单的二叉树  插入使用递归，从上到下查找新节点在树种的合适位置 删除时候需分以下三种情况进行考虑:">
@@ -360,7 +360,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-09-24 12:14:55" itemprop="dateModified" datetime="2018-09-24T12:14:55+08:00">2018-09-24</time>
+                <time title="Modified: 2018-09-24 12:17:28" itemprop="dateModified" datetime="2018-09-24T12:17:28+08:00">2018-09-24</time>
               
             
           </span>
@@ -434,9 +434,9 @@
 <p><img src="/images/2018/09/radix-tree.png" alt="radix-tree"></p>
 <p>Radix 树在 Linux 中的应用：</p>
 <p>Linux 基数树（radix tree）是将 long 整数键值与指针相关联的机制，它存储有效率，并且可快速查询，用于整数值与指针的映射（如：IDR 机制）、内存管理等。<br>IDR（ID Radix）机制是将对象的身份鉴别号整数值 ID 与对象指针建立关联表，完成从 ID 与指针之间的相互转换。IDR 机制使用 radix 树状结构作为由 id 进行索引获取指针的稀疏数组，通过使用位图可以快速分配新的 ID，IDR 机制避免了使用固定尺寸的数组存放指针。IDR 机制的 API 函数在 lib/idr.c 中实现。</p>
-<p>Linux radix 树最广泛的用途是用于<strong>内存管理</strong>，结构 address_space 通过 radix 树<strong>跟踪绑定到地址映射上的核心页</strong>，该 radix 树允许内存管理代码快速查找标识为 dirty 或 writeback 的页。其使用的是数据类型 unsigned long 的固定长度输入的版本。每级代表了输入空间固定位数。Linux radix 树的 API 函数在 lib/radix-tree.c 中实现。（把页指针和描述页状态的结构映射起来，使能快速查询一个页的信息。）</p>
+<p>Linux radix 树最广泛的用途是用于 <strong>内存管理</strong>，结构 address_space 通过 radix 树 <strong>跟踪绑定到地址映射上的核心页</strong>，该 radix 树允许内存管理代码快速查找标识为 dirty 或 writeback 的页。其使用的是数据类型 unsigned long 的固定长度输入的版本。每级代表了输入空间固定位数。Linux radix 树的 API 函数在 lib/radix-tree.c 中实现。（把页指针和描述页状态的结构映射起来，使能快速查询一个页的信息。）</p>
 <p>Linux 内核利用 radix 树在文件内偏移快速定位文件缓存页。<br>Linux(2.6.7) 内核中的分叉为 64(2^6)，树高为 6(64 位系统)或者 11(32 位系统)，用来快速定位 32 位或者 64 位偏移，radix tree 中的每一个叶子节点指向文件内相应偏移所对应的 Cache 项。</p>
-<p>【radix 树为稀疏树提供了有效的存储，代替固定尺寸数组提供了键值到指针的快速查找。】</p>
+<p><strong>radix 树为稀疏树提供了有效的存储，代替固定尺寸数组提供了键值到指针的快速查找。</strong></p>
 <p>Radix 树与 Trie 树的思想有点类似，甚至可以把 Trie 树看为一个基为 26 的 Radix 树。（也可以把 Radix 树看做是 Tire 树的变异）<br>Trie 树一般用于字符串到对象的映射，Radix 树一般用于长整数到对象的映射。<br>trie 树主要问题是树的层高，如果要索引的字的拼音很长很变态，我们也要建一个很高很变态的树么？<br>radix 树能固定层高（对于较长的字符串，可以用数学公式计算出其特征值，再用 radix 树存储这些特征值）</p>
 <ol>
 <li><p>插入<br>我们在插入一个新节点时，我们根据数据的比特位，在树中向下查找，若没有相应结点，则生成相应结点，直到数据的比特位访问完，则建立叶节点映射相应的对象。</p>
